@@ -1,4 +1,4 @@
-/* ─── API Response Envelope ─── */
+
 export interface ApiSuccess<T> {
   success: true;
   data: T;
@@ -23,7 +23,7 @@ export interface ApiErrorResponse {
 
 export type ApiResponse<T> = ApiSuccess<T> | ApiErrorResponse;
 
-/* ─── Serialized Error (Redux-safe, no class instances) ─── */
+
 export interface SerializedError {
   code: string;
   message: string;
@@ -31,13 +31,13 @@ export interface SerializedError {
   statusCode?: number;
 }
 
-/* ─── Generic Async State ─── */
+
 export interface AsyncState {
   loading: boolean;
   error: SerializedError | null;
 }
 
-/* ─── Auth ─── */
+
 export interface User {
   id: string;
   name: string;
@@ -67,7 +67,7 @@ export interface RegisterResponse {
   token: string;
 }
 
-/* ─── Dashboard ─── */
+
 export interface MonthlyBreakdown {
   month: string;
   debit: number;
@@ -87,7 +87,7 @@ export interface DashboardData {
   categoryBreakdown: CategoryBreakdown[];
 }
 
-/* ─── Transactions ─── */
+
 export type TransactionCategory = 'food' | 'travel' | 'shopping' | 'bills' | 'entertainment';
 export type TransactionType = 'debit' | 'credit';
 
@@ -117,7 +117,7 @@ export interface TransactionsResponse {
   pagination: PaginationMeta;
 }
 
-/* ─── Wallets ─── */
+
 export type WalletType = 'bank' | 'cash' | 'credit' | 'savings';
 
 export interface Wallet {
@@ -137,7 +137,7 @@ export interface WalletsData {
   totalBalance: number;
 }
 
-/* ─── Tips ─── */
+
 export interface Tip {
   id: string;
   category: string;
@@ -153,7 +153,7 @@ export interface TipsData {
   savedIds: string[];
 }
 
-/* ─── Notification ─── */
+
 export type NotificationType = 'success' | 'error' | 'warning' | 'info';
 
 export interface Notification {

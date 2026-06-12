@@ -2,7 +2,6 @@
    Extracted from the Figma screens. Every color, size, and spacing value
    used in the app must reference these tokens — no magic numbers elsewhere. */
 
-/* ─── Light Mode Colors ─── */
 export const lightColors = {
   pageBg: '#000000',
   appBg: '#171717',
@@ -26,7 +25,6 @@ export const lightColors = {
   modalBg: '#FFFFFF',
 } as const;
 
-/* ─── Dark Mode Colors ─── */
 export const darkColors = {
   pageBg: '#000000',
   appBg: '#0D0D12',
@@ -50,7 +48,6 @@ export const darkColors = {
   modalBg: '#1E1E2D',
 } as const;
 
-/* ─── Shared accent colors (same in both themes) ─── */
 export const accents = {
   tealGreen: '#1BC5BD',
   chartBarActive: '#2F6BFF',
@@ -66,7 +63,6 @@ export const accents = {
   categoryShopping: '#22A7F0',
 } as const;
 
-/* ─── Backward-compatible `colors` export (light defaults) ─── */
 export const colors = {
   ...lightColors,
   ...accents,

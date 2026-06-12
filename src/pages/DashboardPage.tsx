@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -16,11 +16,13 @@ import { selectIsAuthenticated } from '../features/auth/authSlice';
 import { getDateKey, getDateGroupLabel } from '../utils/formatters';
 import { spacing } from '../theme/tokens';
 import { useThemeColors } from '../hooks/useThemeColors';
+import { AddExpenseModal } from '../components/common/AddExpenseModal';
 import type { Transaction } from '../types';
 
 export const DashboardPage: React.FC = () => {
   const colors = useThemeColors();
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const [addOpen, setAddOpen] = useState(false);
   const { data: dashboard, loading: dashLoading, error: dashError, refetch: refetchDash } = useDashboard();
   const {
     items: allTransactions,
@@ -90,6 +92,11 @@ export const DashboardPage: React.FC = () => {
             <Avatar sx={{ backgroundColor: '#22A7F0' }}>C</Avatar>
           </AvatarGroup>
           <Box
+            onClick={() => setAddOpen(true)}
+            role="button"
+            tabIndex={0}
+            aria-label="Add new transaction"
+            onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setAddOpen(true); } }}
             sx={{
               width: 32,
               height: 32,
@@ -165,6 +172,7 @@ export const DashboardPage: React.FC = () => {
           )}
         </>
       )}
+      <AddExpenseModal open={addOpen} onClose={() => setAddOpen(false)} onSuccess={() => { setAddOpen(false); refetchDash(); refetchTxn(); }} />
     </Box>
   );
 };

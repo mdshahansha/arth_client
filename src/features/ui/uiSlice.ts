@@ -1,7 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../../app/store';
 
-/* ─── State ─── */
 interface UiState {
   activeNav: string;
   globalLoading: boolean;
@@ -14,7 +13,6 @@ const initialState: UiState = {
   loadingKeys: {},
 };
 
-/* ─── Slice ─── */
 const uiSlice = createSlice({
   name: 'ui',
   initialState,
@@ -37,7 +35,6 @@ const uiSlice = createSlice({
 
 export const { setActiveNav, setGlobalLoading, setLoadingKey } = uiSlice.actions;
 
-/* ─── Selectors ─── */
 export const selectActiveNav = (state: RootState) => state.ui.activeNav;
 export const selectGlobalLoading = (state: RootState) => state.ui.globalLoading;
 export const selectIsLoading = (key: string) => (state: RootState) =>

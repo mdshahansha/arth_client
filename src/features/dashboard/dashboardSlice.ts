@@ -4,7 +4,6 @@ import { normalizeError } from '../../api/apiClient';
 import type { DashboardData, SerializedError } from '../../types';
 import type { RootState } from '../../app/store';
 
-/* ─── State ─── */
 interface DashboardState {
   data: DashboardData | null;
   loading: boolean;
@@ -19,10 +18,8 @@ const initialState: DashboardState = {
   lastFetched: null,
 };
 
-/* ─── Stale-time: skip refetch if data is < 60s old ─── */
 const STALE_TIME = 60_000;
 
-/* ─── Async Thunk ─── */
 export const fetchDashboardThunk = createAsyncThunk<
   DashboardData,
   void,
@@ -63,7 +60,6 @@ export const refetchDashboardThunk = createAsyncThunk<
   }
 });
 
-/* ─── Slice ─── */
 const dashboardSlice = createSlice({
   name: 'dashboard',
   initialState,
@@ -107,7 +103,6 @@ const dashboardSlice = createSlice({
 
 export const { clearDashboard } = dashboardSlice.actions;
 
-/* ─── Selectors ─── */
 export const selectDashboard = (state: RootState) => state.dashboard;
 export const selectDashboardData = (state: RootState) => state.dashboard.data;
 export const selectDashboardLoading = (state: RootState) => state.dashboard.loading;

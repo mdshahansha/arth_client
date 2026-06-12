@@ -5,7 +5,6 @@ import { StorageKeys } from '../../constants/api';
 import type { User, SerializedError, LoginPayload, RegisterInput } from '../../types';
 import type { RootState } from '../../app/store';
 
-/* ─── State ─── */
 interface AuthState {
   user: User | null;
   token: string | null;
@@ -52,7 +51,6 @@ const initialState: AuthState = {
   welcomeName: '',
 };
 
-/* ─── Async Thunks ─── */
 export const loginThunk = createAsyncThunk<
   { user: User; token: string },
   LoginPayload,
@@ -95,7 +93,6 @@ export const logoutThunk = createAsyncThunk<void, void, { rejectValue: Serialize
   },
 );
 
-/* ─── Slice ─── */
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -142,7 +139,6 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      /* ─── Login ─── */
       .addCase(loginThunk.pending, (state) => {
         state.loginLoading = true;
         state.loginError = null;
@@ -167,7 +163,6 @@ const authSlice = createSlice({
         };
       })
 
-      /* ─── Register ─── */
       .addCase(registerThunk.pending, (state) => {
         state.registerLoading = true;
         state.registerError = null;
@@ -186,7 +181,6 @@ const authSlice = createSlice({
         };
       })
 
-      /* ─── Logout ─── */
       .addCase(logoutThunk.pending, (state) => {
         state.logoutLoading = true;
       })
@@ -216,7 +210,6 @@ export const {
   dismissWelcomeSplash,
 } = authSlice.actions;
 
-/* ─── Selectors ─── */
 export const selectAuth = (state: RootState) => state.auth;
 export const selectUser = (state: RootState) => state.auth.user;
 export const selectIsAuthenticated = (state: RootState) => state.auth.isAuthenticated;

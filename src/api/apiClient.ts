@@ -12,14 +12,12 @@ import {
 } from '../constants/api';
 import type { ApiErrorResponse, SerializedError } from '../types';
 
-/* ─── Axios Instance ─── */
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
   timeout: REQUEST_TIMEOUT,
 });
 
-/* ─── Request Interceptor: Inject Bearer Token ─── */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem(StorageKeys.TOKEN);
@@ -31,7 +29,6 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-/* ─── Response Interceptor: Normalize Errors + 401 Handling ─── */
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError<ApiErrorResponse>) => {
@@ -44,12 +41,10 @@ apiClient.interceptors.response.use(
   },
 );
 
-/* ─── Error Normalizer ─── */
 export function normalizeError(error: unknown): SerializedError {
   if (axios.isAxiosError(error)) {
     const axiosErr = error as AxiosError<ApiErrorResponse>;
 
-    // Network error (no response)
     if (!axiosErr.response) {
       if (axiosErr.code === 'ECONNABORTED') {
         return {
@@ -65,7 +60,6 @@ export function normalizeError(error: unknown): SerializedError {
       };
     }
 
-    // API returned structured error
     const data = axiosErr.response.data;
     if (data?.error) {
       return {
@@ -76,7 +70,6 @@ export function normalizeError(error: unknown): SerializedError {
       };
     }
 
-    // Non-structured HTTP error
     return {
       code: ErrorCodes.UNKNOWN_ERROR,
       message: `Request failed with status ${axiosErr.response.status}`,
@@ -84,7 +77,6 @@ export function normalizeError(error: unknown): SerializedError {
     };
   }
 
-  // Non-axios error
   return {
     code: ErrorCodes.UNKNOWN_ERROR,
     message: error instanceof Error ? error.message : 'An unexpected error occurred',

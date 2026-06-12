@@ -25,6 +25,7 @@ import { selectIsAuthenticated } from '../features/auth/authSlice';
 import { formatAmount, formatTransactionAmount, formatTime } from '../utils/formatters';
 import { spacing } from '../theme/tokens';
 import { useThemeColors } from '../hooks/useThemeColors';
+import { AddExpenseModal } from '../components/common/AddExpenseModal';
 import type { Transaction, TransactionCategory } from '../types';
 
 const categoryLabels: Record<string, string> = {
@@ -44,11 +45,12 @@ const statusColors: Record<string, string> = {
 export const ExpensesPage: React.FC = () => {
   const colors = useThemeColors();
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
-  const { data: dashboard, loading: dashLoading, categories } = useDashboard();
-  const { items: transactions, loading: txnLoading, hasNextPage, loadingMore, fetchNextPage } = useTransactions();
+  const { data: dashboard, loading: dashLoading, categories, refetch: refetchDash } = useDashboard();
+  const { items: transactions, loading: txnLoading, hasNextPage, loadingMore, fetchNextPage, refetch: refetchTxn } = useTransactions();
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState('all');
   const [exportAnchor, setExportAnchor] = useState<null | HTMLElement>(null);
+  const [addOpen, setAddOpen] = useState(false);
 
   const chartData = useMemo(() => {
     if (!dashboard?.monthlyBreakdown) return undefined;
@@ -126,7 +128,7 @@ export const ExpensesPage: React.FC = () => {
             <MenuItem onClick={() => handleExport('excel')}>Excel sheet</MenuItem>
             <MenuItem onClick={() => handleExport('pdf')}>PDF</MenuItem>
           </Menu>
-          <Button variant="contained" startIcon={<AddIcon />} sx={{ backgroundColor: colors.loginButton, textTransform: 'none', fontWeight: 600, '&:hover': { backgroundColor: colors.chartBarActive } }}>Add Expense</Button>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setAddOpen(true)} sx={{ backgroundColor: colors.loginButton, textTransform: 'none', fontWeight: 600, '&:hover': { backgroundColor: colors.chartBarActive } }}>Add Expense</Button>
         </Box>
       </Box>
 
@@ -236,6 +238,7 @@ export const ExpensesPage: React.FC = () => {
           )}
         </Box>
       </Box>
+      <AddExpenseModal open={addOpen} onClose={() => setAddOpen(false)} onSuccess={() => { setAddOpen(false); refetchTxn(); refetchDash(); }} />
     </Box>
   );
 };

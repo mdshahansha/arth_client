@@ -8,13 +8,17 @@ import { LoginModal } from './components/auth/LoginModal';
 import { RegisterModal } from './components/auth/RegisterModal';
 import { AuthListener } from './components/auth/AuthListener';
 import { WelcomeSplash } from './components/common/WelcomeSplash';
+import { useSSE } from './hooks/useSSE';
 import './theme/global.css';
+
+const SSEListener: React.FC = () => { useSSE(); return null; };
 
 const App: React.FC = () => (
   <Provider store={store}>
     <AppThemeProvider>
       <a href="#main-content" className="skip-to-main">Skip to main content</a>
       <AuthListener />
+      <SSEListener />
       <WelcomeSplash />
       <AppShell />
       <LoginModal />

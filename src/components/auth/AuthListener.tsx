@@ -5,10 +5,7 @@ import { clearDashboard } from '../../features/dashboard/dashboardSlice';
 import { clearTransactions } from '../../features/transactions/transactionsSlice';
 import { AUTH_EXPIRED_EVENT } from '../../constants/api';
 
-/**
- * Headless component: listens for auth:expired events from the axios
- * interceptor and dispatches Redux actions to clear state + show login.
- */
+ 
 export function AuthListener() {
   const dispatch = useAppDispatch();
 

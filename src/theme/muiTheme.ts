@@ -1,7 +1,6 @@
 import { createTheme, type ThemeOptions } from '@mui/material/styles';
 import { lightColors, darkColors, accents, typography, spacing } from './tokens';
 
-/* ─── Shared base config ─── */
 const baseTheme: ThemeOptions = {
   breakpoints: {
     values: { xs: 0, sm: 768, md: 1280, lg: 1440, xl: 1920 },
@@ -46,7 +45,6 @@ const baseTheme: ThemeOptions = {
   },
 };
 
-/* ─── Light Theme ─── */
 export const lightTheme = createTheme({
   ...baseTheme,
   palette: {
@@ -103,7 +101,6 @@ export const lightTheme = createTheme({
   },
 });
 
-/* ─── Dark Theme ─── */
 export const darkTheme = createTheme({
   ...baseTheme,
   palette: {

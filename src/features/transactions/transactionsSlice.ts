@@ -4,7 +4,6 @@ import { normalizeError } from '../../api/apiClient';
 import type { Transaction, PaginationMeta, SerializedError } from '../../types';
 import type { RootState } from '../../app/store';
 
-/* ─── State ─── */
 interface TransactionsState {
   items: Transaction[];
   pagination: PaginationMeta | null;
@@ -25,7 +24,6 @@ const initialState: TransactionsState = {
 
 const PAGE_LIMIT = 10;
 
-/* ─── Async Thunks ─── */
 
 /** Fetch first page (resets list) */
 export const fetchTransactionsThunk = createAsyncThunk<
@@ -65,7 +63,6 @@ export const fetchNextPageThunk = createAsyncThunk<
   },
 });
 
-/* ─── Slice ─── */
 const transactionsSlice = createSlice({
   name: 'transactions',
   initialState,
@@ -121,7 +118,6 @@ const transactionsSlice = createSlice({
 
 export const { clearTransactions } = transactionsSlice.actions;
 
-/* ─── Selectors ─── */
 export const selectTransactions = (state: RootState) => state.transactions;
 export const selectTransactionItems = (state: RootState) => state.transactions.items;
 export const selectTransactionsLoading = (state: RootState) => state.transactions.loading;

@@ -23,6 +23,7 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import PieChartIcon from '@mui/icons-material/PieChart';
 import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import SchoolIcon from '@mui/icons-material/School';
+import toast from 'react-hot-toast';
 import { spacing } from '../theme/tokens';
 import { useThemeColors } from '../hooks/useThemeColors';
 import { useTips } from '../hooks/useTips';
@@ -106,7 +107,7 @@ export const ViewTipsPage: React.FC = () => {
                   <Typography sx={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.01em', mb: '10px' }}>{featured.title}</Typography>
                   <Typography sx={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.65)', lineHeight: 1.6, maxWidth: 440 }}>{featured.body}</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: '16px', mt: '22px' }}>
-                    <Button variant="contained" sx={{ backgroundColor: '#167AFF', textTransform: 'none', fontWeight: 700 }}>Read guide</Button>
+                    <Button variant="contained" onClick={() => toast.success(`Opening: ${featured.title}`)} sx={{ backgroundColor: '#167AFF', textTransform: 'none', fontWeight: 700 }}>Read guide</Button>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.55)' }}>
                       <AccessTimeIcon sx={{ fontSize: 15 }} /> {featured.read_time} read
                     </Box>
@@ -140,7 +141,7 @@ export const ViewTipsPage: React.FC = () => {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: 12, fontWeight: 700, color: colors.textSecondary }}>
                       <AccessTimeIcon sx={{ fontSize: 14 }} /> {t.read_time} read
                     </Box>
-                    <Button size="small" endIcon={<ArrowForwardIcon sx={{ fontSize: 15 }} />} sx={{ textTransform: 'none', fontWeight: 700, color: colors.textSecondary }}>Read</Button>
+                    <Button size="small" onClick={() => toast.success(`Opening: ${t.title}`)} endIcon={<ArrowForwardIcon sx={{ fontSize: 15 }} />} sx={{ textTransform: 'none', fontWeight: 700, color: colors.textSecondary }}>Read</Button>
                   </Box>
                 </Box>
               ))}
@@ -194,7 +195,7 @@ export const ViewTipsPage: React.FC = () => {
               <Typography sx={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.65)', lineHeight: 1.55, mb: '18px' }}>
                 Short lessons on budgeting, saving and investing — learn at your own pace.
               </Typography>
-              <Button variant="contained" sx={{ backgroundColor: '#167AFF', textTransform: 'none', fontWeight: 700 }}>Browse library</Button>
+              <Button variant="contained" onClick={() => toast.success('Learning library coming soon!')} sx={{ backgroundColor: '#167AFF', textTransform: 'none', fontWeight: 700 }}>Browse library</Button>
             </Box>
           </Box>
         </Box>
