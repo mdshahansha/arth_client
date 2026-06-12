@@ -65,8 +65,8 @@ export const DashboardPage: React.FC = () => {
       sx={{
         flex: 1,
         backgroundColor: colors.cardBg,
-        borderRadius: `${spacing.cardBorderRadius}px 0 0 ${spacing.cardBorderRadius}px`,
-        p: `${spacing.cardPadding}px`,
+        borderRadius: { xs: 0, md: `${spacing.cardBorderRadius}px 0 0 ${spacing.cardBorderRadius}px` },
+        p: { xs: '20px 16px', sm: '30px 24px', md: `${spacing.cardPadding}px` },
         minHeight: '100vh',
         overflowY: 'auto',
         transition: 'background-color 0.3s ease, color 0.3s ease',
@@ -75,7 +75,7 @@ export const DashboardPage: React.FC = () => {
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '8px' }}>
         <Box>
-          <Typography sx={{ fontSize: '34px', fontWeight: 600, color: colors.textPrimary }}>
+          <Typography component="h1" sx={{ fontSize: '34px', fontWeight: 600, color: colors.textPrimary }}>
             Expenses
           </Typography>
           <Typography sx={{ fontSize: '14px', color: colors.textSecondary, mt: '4px' }}>
@@ -107,9 +107,9 @@ export const DashboardPage: React.FC = () => {
       </Box>
 
       {/* Chart */}
-      <Box sx={{ mb: '32px' }}>
+      <Box aria-live="polite" sx={{ mb: '32px' }}>
         {dashLoading ? (
-          <Skeleton variant="rounded" width="100%" height={120} />
+          <Skeleton variant="rounded" width="100%" height={120} aria-label="Loading chart data" />
         ) : (
           <SpendChart data={chartData} />
         )}

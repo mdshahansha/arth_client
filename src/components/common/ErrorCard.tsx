@@ -13,6 +13,7 @@ export const ErrorCard: React.FC<ErrorCardProps> = ({ message, onRetry }) => {
   const colors = useThemeColors();
   return (
     <Box
+      role="alert"
       sx={{
         p: 3,
         borderRadius: 2,

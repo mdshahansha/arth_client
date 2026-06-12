@@ -27,10 +27,10 @@ export const TransactionGroup: React.FC<TransactionGroupProps> = ({ label, trans
         mb: '4px',
       }}
     >
-      <Typography sx={{ fontSize: '16px', fontWeight: 600, color: colors.textPrimary }}>
+      <Typography component="h2" sx={{ fontSize: '16px', fontWeight: 600, color: colors.textPrimary }}>
         {label}
       </Typography>
-      <IconButton size="small" sx={{ color: colors.textSecondary }}>
+      <IconButton size="small" aria-label={`More options for ${label}`} sx={{ color: colors.textSecondary }}>
         <MoreHorizIcon />
       </IconButton>
     </Box>

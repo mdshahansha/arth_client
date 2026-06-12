@@ -61,18 +61,18 @@ export const AccountsPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ flex: 1, backgroundColor: colors.cardBg, borderRadius: `${spacing.cardBorderRadius}px`, p: '40px 44px', minHeight: '100vh', overflowY: 'auto', transition: 'background-color 0.3s ease' }}>
+    <Box sx={{ flex: 1, backgroundColor: colors.cardBg, borderRadius: { xs: 0, md: `${spacing.cardBorderRadius}px` }, p: { xs: '20px 16px', sm: '30px 24px', md: '40px 44px' }, minHeight: '100vh', overflowY: 'auto', transition: 'background-color 0.3s ease' }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '28px' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '28px', flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography sx={{ fontSize: 34, fontWeight: 600, color: colors.textPrimary }}>Accounts</Typography>
+          <Typography component="h1" sx={{ fontSize: 34, fontWeight: 600, color: colors.textPrimary }}>Accounts</Typography>
           <Typography sx={{ fontSize: 14, color: colors.textSecondary, mt: '4px' }}>Manage members, roles and permissions.</Typography>
         </Box>
         <Button variant="contained" startIcon={<PersonAddIcon />} sx={{ backgroundColor: colors.loginButton, textTransform: 'none', fontWeight: 600, '&:hover': { backgroundColor: colors.chartBarActive } }}>Invite member</Button>
       </Box>
 
       {/* Stat Cards */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', mb: '28px' }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }, gap: '20px', mb: '28px' }}>
         <MiniStat colors={colors} icon={<PeopleIcon sx={{ color: '#fff', fontSize: 20 }} />} iconBg="#32A7E2" label="Total Members" value="5" caption="2 admins" />
         <MiniStat colors={colors} icon={<PersonIcon sx={{ color: '#fff', fontSize: 20 }} />} iconBg="#31BA96" label="Active" value="3" caption="this week" />
         <MiniStat colors={colors} icon={<MailIcon sx={{ color: '#fff', fontSize: 20 }} />} iconBg="#FF8701" label="Pending Invites" value="1" caption="awaiting" />
@@ -82,16 +82,16 @@ export const AccountsPage: React.FC = () => {
       {/* Team Members Table */}
       <Box sx={{ backgroundColor: colors.rightPanelBg, borderRadius: '20px', mb: '28px', transition: 'background-color 0.3s ease' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: '20px 24px', flexWrap: 'wrap' }}>
-          <Typography sx={{ fontSize: 18, fontWeight: 800, color: colors.textPrimary, mr: 'auto' }}>Team Members</Typography>
+          <Typography component="h2" sx={{ fontSize: 18, fontWeight: 800, color: colors.textPrimary, mr: 'auto' }}>Team Members</Typography>
           <TextField size="small" placeholder="Search members..." value={search} onChange={(e) => setSearch(e.target.value)}
             slotProps={{ input: { startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 18, color: colors.textSecondary }} /></InputAdornment> } }}
             sx={{ width: 220, '& .MuiOutlinedInput-root': { borderRadius: '10px', backgroundColor: colors.cardBg } }}
           />
         </Box>
 
-        <Box sx={{ px: '24px' }}>
+        <Box sx={{ px: '24px', overflowX: 'auto' }}>
           {/* Header Row */}
-          <Box sx={{ display: 'grid', gridTemplateColumns: '40px 2fr 1fr 1fr 1fr 48px', gap: 2, py: '12px', borderBottom: `1px solid ${colors.divider}`, alignItems: 'center' }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: '40px 2fr 1fr 1fr 1fr 48px', gap: 2, py: '12px', borderBottom: `1px solid ${colors.divider}`, alignItems: 'center', minWidth: 700 }}>
             <Checkbox checked={allSel} onChange={() => setSelected(allSel ? [] : accounts.map((a) => a.id))} size="small" />
             {['User', 'Role', 'Status', 'Last active', ''].map((h) => (
               <Typography key={h} sx={{ fontSize: 12, fontWeight: 700, color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</Typography>
@@ -99,7 +99,7 @@ export const AccountsPage: React.FC = () => {
           </Box>
 
           {filtered.map((acc) => (
-            <Box key={acc.id} sx={{ display: 'grid', gridTemplateColumns: '40px 2fr 1fr 1fr 1fr 48px', gap: 2, py: '14px', borderBottom: `1px solid ${colors.divider}`, alignItems: 'center', cursor: 'pointer', '&:hover': { backgroundColor: `${colors.divider}40` }, transition: 'background-color 150ms' }}>
+            <Box key={acc.id} sx={{ display: 'grid', gridTemplateColumns: '40px 2fr 1fr 1fr 1fr 48px', gap: 2, py: '14px', borderBottom: `1px solid ${colors.divider}`, alignItems: 'center', cursor: 'pointer', '&:hover': { backgroundColor: `${colors.divider}40` }, transition: 'background-color 150ms', minWidth: 700 }}>
               <Checkbox checked={selected.includes(acc.id)} onChange={() => toggle(acc.id)} size="small" />
               <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <Avatar sx={{ width: 40, height: 40, fontSize: 14, fontWeight: 700, backgroundColor: acc.roleTone }}>{acc.name.charAt(0)}</Avatar>
@@ -121,7 +121,7 @@ export const AccountsPage: React.FC = () => {
       </Box>
 
       {/* Permission Cards */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }, gap: '20px' }}>
         {permissions.map((p) => (
           <Box key={p.role} sx={{ border: `1px solid ${colors.divider}`, borderRadius: '20px', p: '24px', transition: 'border-color 0.3s ease' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px', mb: '14px' }}>

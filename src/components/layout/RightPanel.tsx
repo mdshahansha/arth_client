@@ -16,6 +16,8 @@ export const RightPanel: React.FC<RightPanelProps> = ({ categories, isLoading })
   const colors = useThemeColors();
   return (
     <Box
+      component="aside"
+      aria-label="Category breakdown and promotions"
       sx={{
         width: spacing.rightPanelWidth,
         minWidth: spacing.rightPanelWidth,

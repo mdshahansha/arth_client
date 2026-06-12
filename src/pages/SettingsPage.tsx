@@ -7,6 +7,8 @@ import Avatar from '@mui/material/Avatar';
 import Switch from '@mui/material/Switch';
 import MenuItem from '@mui/material/MenuItem';
 import Chip from '@mui/material/Chip';
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
 import PersonIcon from '@mui/icons-material/Person';
 import ShieldIcon from '@mui/icons-material/Shield';
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -25,11 +27,12 @@ import MonitorIcon from '@mui/icons-material/Monitor';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import AddIcon from '@mui/icons-material/Add';
-import { useAppSelector } from '../app/hooks';
-import { selectIsAuthenticated, selectUser } from '../features/auth/authSlice';
+import { useAppSelector, useAppDispatch } from '../app/hooks';
+import { selectIsAuthenticated, selectUser, setUser } from '../features/auth/authSlice';
 import { useThemeMode } from '../context/ThemeContext';
 import { spacing } from '../theme/tokens';
 import { useThemeColors } from '../hooks/useThemeColors';
+import { updateProfile, changePassword } from '../api/settings.api';
 
 const navSections = [
   { label: 'Profile', icon: <PersonIcon sx={{ fontSize: 18 }} /> },
@@ -42,11 +45,61 @@ const navSections = [
 
 export const SettingsPage: React.FC = () => {
   const colors = useThemeColors();
+  const dispatch = useAppDispatch();
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const user = useAppSelector(selectUser);
   const { mode, toggleTheme } = useThemeMode();
   const [section, setSection] = useState('Profile');
   const [prefs, setPrefs] = useState({ product: true, security: true, marketing: false, weekly: true, twofa: true });
+
+  const [profileName, setProfileName] = useState(user?.name || '');
+  const [profileEmail, setProfileEmail] = useState(user?.email || '');
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileMsg, setProfileMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  const [currentPwd, setCurrentPwd] = useState('');
+  const [newPwd, setNewPwd] = useState('');
+  const [confirmPwd, setConfirmPwd] = useState('');
+  const [pwdSaving, setPwdSaving] = useState(false);
+  const [pwdMsg, setPwdMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  const handleProfileSave = async () => {
+    setProfileSaving(true);
+    setProfileMsg(null);
+    try {
+      const updated = await updateProfile({ name: profileName, email: profileEmail });
+      dispatch(setUser(updated));
+      setProfileMsg({ type: 'success', text: 'Profile updated successfully.' });
+    } catch (err: any) {
+      setProfileMsg({ type: 'error', text: err?.response?.data?.message || 'Failed to update profile.' });
+    } finally {
+      setProfileSaving(false);
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    if (newPwd !== confirmPwd) {
+      setPwdMsg({ type: 'error', text: 'Passwords do not match.' });
+      return;
+    }
+    if (newPwd.length < 6) {
+      setPwdMsg({ type: 'error', text: 'New password must be at least 6 characters.' });
+      return;
+    }
+    setPwdSaving(true);
+    setPwdMsg(null);
+    try {
+      await changePassword(currentPwd, newPwd);
+      setPwdMsg({ type: 'success', text: 'Password changed successfully.' });
+      setCurrentPwd('');
+      setNewPwd('');
+      setConfirmPwd('');
+    } catch (err: any) {
+      setPwdMsg({ type: 'error', text: err?.response?.data?.message || 'Failed to change password.' });
+    } finally {
+      setPwdSaving(false);
+    }
+  };
 
   if (!isAuthenticated) {
     return (
@@ -61,6 +114,7 @@ export const SettingsPage: React.FC = () => {
   if (section === 'Profile') {
     content = (
       <SettingsCard colors={colors} title="Profile Settings" desc="Update your personal information and avatar.">
+        {profileMsg && <Alert severity={profileMsg.type} onClose={() => setProfileMsg(null)} sx={{ borderRadius: '10px' }}>{profileMsg.text}</Alert>}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '18px', mb: '22px' }}>
           <Avatar src={user?.profile_image_url || undefined} sx={{ width: 72, height: 72, fontSize: 28 }}>{user?.name?.charAt(0)}</Avatar>
           <Box sx={{ display: 'flex', gap: '10px' }}>
@@ -69,8 +123,8 @@ export const SettingsPage: React.FC = () => {
           </Box>
         </Box>
         <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px', mb: '22px' }}>
-          <TextField label="Full name" defaultValue={user?.name || ''} fullWidth variant="outlined" size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }} />
-          <TextField label="Email" defaultValue={user?.email || ''} fullWidth variant="outlined" size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }} />
+          <TextField label="Full name" value={profileName} onChange={(e) => setProfileName(e.target.value)} fullWidth variant="outlined" size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }} />
+          <TextField label="Email" value={profileEmail} onChange={(e) => setProfileEmail(e.target.value)} fullWidth variant="outlined" size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }} />
           <TextField label="Phone" defaultValue="+62 812 3456 7890" fullWidth variant="outlined" size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }} />
           <TextField label="Language" defaultValue="English (US)" fullWidth variant="outlined" size="small" select sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}>
             <MenuItem value="English (US)">English (US)</MenuItem>
@@ -78,8 +132,11 @@ export const SettingsPage: React.FC = () => {
           </TextField>
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-          <Button sx={{ textTransform: 'none', color: colors.textSecondary }}>Cancel</Button>
-          <Button variant="contained" sx={{ textTransform: 'none', backgroundColor: colors.loginButton, '&:hover': { backgroundColor: colors.chartBarActive } }}>Save changes</Button>
+          <Button sx={{ textTransform: 'none', color: colors.textSecondary }} onClick={() => { setProfileName(user?.name || ''); setProfileEmail(user?.email || ''); setProfileMsg(null); }}>Cancel</Button>
+          <Button variant="contained" onClick={handleProfileSave} disabled={profileSaving}
+            sx={{ textTransform: 'none', backgroundColor: colors.loginButton, '&:hover': { backgroundColor: colors.chartBarActive } }}>
+            {profileSaving ? <CircularProgress size={20} sx={{ color: '#fff' }} /> : 'Save changes'}
+          </Button>
         </Box>
       </SettingsCard>
     );
@@ -87,14 +144,18 @@ export const SettingsPage: React.FC = () => {
     content = (
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         <SettingsCard colors={colors} title="Password Management" desc="Choose a strong password you don't use elsewhere.">
+          {pwdMsg && <Alert severity={pwdMsg.type} onClose={() => setPwdMsg(null)} sx={{ borderRadius: '10px' }}>{pwdMsg.text}</Alert>}
           <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px', mb: '22px' }}>
-            <TextField label="Current password" type="password" defaultValue="password" fullWidth size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }} />
+            <TextField label="Current password" type="password" value={currentPwd} onChange={(e) => setCurrentPwd(e.target.value)} fullWidth size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }} />
             <Box />
-            <TextField label="New password" type="password" placeholder="••••••••" fullWidth size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }} />
-            <TextField label="Confirm password" type="password" placeholder="••••••••" fullWidth size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }} />
+            <TextField label="New password" type="password" value={newPwd} onChange={(e) => setNewPwd(e.target.value)} placeholder="••••••••" fullWidth size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }} />
+            <TextField label="Confirm password" type="password" value={confirmPwd} onChange={(e) => setConfirmPwd(e.target.value)} placeholder="••••••••" fullWidth size="small" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }} />
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button variant="contained" sx={{ textTransform: 'none', backgroundColor: colors.loginButton, '&:hover': { backgroundColor: colors.chartBarActive } }}>Update password</Button>
+            <Button variant="contained" onClick={handlePasswordChange} disabled={pwdSaving || !currentPwd || !newPwd || !confirmPwd}
+              sx={{ textTransform: 'none', backgroundColor: colors.loginButton, '&:hover': { backgroundColor: colors.chartBarActive } }}>
+              {pwdSaving ? <CircularProgress size={20} sx={{ color: '#fff' }} /> : 'Update password'}
+            </Button>
           </Box>
         </SettingsCard>
         <SettingsCard colors={colors} title="Two-Factor Authentication" desc="Add an extra layer of security to your account.">
@@ -200,25 +261,28 @@ export const SettingsPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ flex: 1, backgroundColor: colors.cardBg, borderRadius: `${spacing.cardBorderRadius}px`, p: '40px 44px', minHeight: '100vh', overflowY: 'auto', transition: 'background-color 0.3s ease' }}>
+    <Box sx={{ flex: 1, backgroundColor: colors.cardBg, borderRadius: { xs: 0, md: `${spacing.cardBorderRadius}px` }, p: { xs: '20px 16px', sm: '30px 24px', md: '40px 44px' }, minHeight: '100vh', overflowY: 'auto', transition: 'background-color 0.3s ease' }}>
       <Box sx={{ mb: '28px' }}>
-        <Typography sx={{ fontSize: 34, fontWeight: 600, color: colors.textPrimary }}>Settings</Typography>
+        <Typography component="h1" sx={{ fontSize: 34, fontWeight: 600, color: colors.textPrimary }}>Settings</Typography>
         <Typography sx={{ fontSize: 14, color: colors.textSecondary, mt: '4px' }}>Manage your account, security and preferences.</Typography>
       </Box>
 
-      <Box sx={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '28px', alignItems: 'start' }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '240px 1fr' }, gap: '28px', alignItems: 'start' }}>
         {/* Sidebar Nav */}
-        <Box sx={{ backgroundColor: colors.rightPanelBg, borderRadius: '20px', p: '12px', position: 'sticky', top: 0, transition: 'background-color 0.3s ease' }}>
-          {navSections.map(({ label, icon }) => {
-            const on = section === label;
-            return (
-              <Box key={label} onClick={() => setSection(label)}
-                sx={{ display: 'flex', alignItems: 'center', gap: '12px', p: '11px 14px', borderRadius: '14px', cursor: 'pointer', backgroundColor: on ? colors.cardBg : 'transparent', color: on ? colors.textPrimary : colors.textSecondary, fontWeight: 700, fontSize: 14.5, transition: 'background-color 150ms', '&:hover': { backgroundColor: colors.cardBg } }}>
-                <Box sx={{ color: on ? '#167AFF' : colors.textSecondary }}>{icon}</Box>
-                {label}
-              </Box>
-            );
-          })}
+        <Box component="nav" aria-label="Settings sections" sx={{ backgroundColor: colors.rightPanelBg, borderRadius: '20px', p: '12px', position: 'sticky', top: 0, transition: 'background-color 0.3s ease' }}>
+          <Box component="ul" role="tablist" aria-label="Settings sections" sx={{ listStyle: 'none', m: 0, p: 0 }}>
+            {navSections.map(({ label, icon }) => {
+              const on = section === label;
+              return (
+                <Box component="li" key={label} role="tab" tabIndex={0} aria-selected={on} onClick={() => setSection(label)}
+                  onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSection(label); } }}
+                  sx={{ display: 'flex', alignItems: 'center', gap: '12px', p: '11px 14px', borderRadius: '14px', cursor: 'pointer', backgroundColor: on ? colors.cardBg : 'transparent', color: on ? colors.textPrimary : colors.textSecondary, fontWeight: 700, fontSize: 14.5, transition: 'background-color 150ms', '&:hover': { backgroundColor: colors.cardBg } }}>
+                  <Box sx={{ color: on ? '#167AFF' : colors.textSecondary }}>{icon}</Box>
+                  {label}
+                </Box>
+              );
+            })}
+          </Box>
         </Box>
 
         <Box>{content}</Box>
@@ -231,7 +295,7 @@ function SettingsCard({ colors, title, desc, children }: { colors: any; title: s
   return (
     <Box sx={{ backgroundColor: colors.rightPanelBg, borderRadius: '20px', p: '24px', display: 'flex', flexDirection: 'column', gap: '22px', transition: 'background-color 0.3s ease' }}>
       <Box>
-        <Typography sx={{ fontSize: 18, fontWeight: 800, color: colors.textPrimary }}>{title}</Typography>
+        <Typography component="h2" sx={{ fontSize: 18, fontWeight: 800, color: colors.textPrimary }}>{title}</Typography>
         <Typography sx={{ fontSize: 13, fontWeight: 600, color: colors.textSecondary, mt: '4px' }}>{desc}</Typography>
       </Box>
       {children}

@@ -63,18 +63,18 @@ export const SummaryPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ flex: 1, backgroundColor: colors.cardBg, borderRadius: `${spacing.cardBorderRadius}px`, p: '40px 44px', minHeight: '100vh', overflowY: 'auto', transition: 'background-color 0.3s ease' }}>
+    <Box sx={{ flex: 1, backgroundColor: colors.cardBg, borderRadius: { xs: 0, md: `${spacing.cardBorderRadius}px` }, p: { xs: '20px 16px', sm: '30px 24px', md: '40px 44px' }, minHeight: '100vh', overflowY: 'auto', transition: 'background-color 0.3s ease' }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '28px' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '28px', flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography sx={{ fontSize: 34, fontWeight: 600, color: colors.textPrimary }}>Executive Summary</Typography>
+          <Typography component="h1" sx={{ fontSize: 34, fontWeight: 600, color: colors.textPrimary }}>Executive Summary</Typography>
           <Typography sx={{ fontSize: 14, color: colors.textSecondary, mt: '4px' }}>Your financial health at a glance.</Typography>
         </Box>
         <Button variant="outlined" startIcon={<DownloadIcon />} sx={{ color: colors.textPrimary, borderColor: colors.divider, textTransform: 'none', fontWeight: 600 }}>Export report</Button>
       </Box>
 
       {/* KPI Cards */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', mb: '28px' }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }, gap: '20px', mb: '28px' }}>
         {loading ? Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} variant="rounded" height={100} sx={{ borderRadius: '16px' }} />) : (
           <>
             <KpiCard colors={colors} icon={<ArrowDownwardIcon sx={{ color: '#fff', fontSize: 20 }} />} iconBg="#31BA96" label="Revenue" value={formatAmount(totalIncome)} delta="3.1%" up />
@@ -86,9 +86,9 @@ export const SummaryPage: React.FC = () => {
       </Box>
 
       {/* Charts Row */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '28px', mb: '28px', alignItems: 'start' }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1.5fr 1fr' }, gap: '28px', mb: '28px', alignItems: 'start' }}>
         <Box sx={{ backgroundColor: colors.rightPanelBg, borderRadius: '20px', p: '24px', transition: 'background-color 0.3s ease' }}>
-          <Typography sx={{ fontSize: 18, fontWeight: 800, color: colors.textPrimary, mb: '8px' }}>Revenue vs Expenses</Typography>
+          <Typography component="h2" sx={{ fontSize: 18, fontWeight: 800, color: colors.textPrimary, mb: '8px' }}>Revenue vs Expenses</Typography>
           <Box sx={{ display: 'flex', gap: '18px', mb: '16px' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
               <Box sx={{ width: 10, height: 10, borderRadius: '3px', backgroundColor: '#167AFF' }} />
@@ -103,7 +103,7 @@ export const SummaryPage: React.FC = () => {
         </Box>
 
         <Box sx={{ backgroundColor: colors.rightPanelBg, borderRadius: '20px', p: '24px', transition: 'background-color 0.3s ease' }}>
-          <Typography sx={{ fontSize: 18, fontWeight: 800, color: colors.textPrimary, mb: '6px' }}>Weekly Trend</Typography>
+          <Typography component="h2" sx={{ fontSize: 18, fontWeight: 800, color: colors.textPrimary, mb: '6px' }}>Weekly Trend</Typography>
           <Typography sx={{ fontSize: 13, fontWeight: 600, color: colors.textSecondary, mb: '18px' }}>Spend by day of week</Typography>
           <SpendChart data={weeklyData} />
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: '10px' }}>
@@ -125,9 +125,9 @@ export const SummaryPage: React.FC = () => {
       </Box>
 
       {/* Insights + AI Recommendations */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '28px', alignItems: 'start' }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: '28px', alignItems: 'start' }}>
         <Box sx={{ backgroundColor: colors.rightPanelBg, borderRadius: '20px', p: '24px', transition: 'background-color 0.3s ease' }}>
-          <Typography sx={{ fontSize: 18, fontWeight: 800, color: colors.textPrimary, mb: '18px' }}>Business Insights</Typography>
+          <Typography component="h2" sx={{ fontSize: 18, fontWeight: 800, color: colors.textPrimary, mb: '18px' }}>Business Insights</Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {insights.map((it, i) => (
               <Box key={i} sx={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
@@ -146,7 +146,7 @@ export const SummaryPage: React.FC = () => {
             <Box sx={{ width: 34, height: 34, borderRadius: '14px', backgroundColor: '#167AFF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <AutoAwesomeIcon sx={{ fontSize: 18, color: '#fff' }} />
             </Box>
-            <Typography sx={{ fontSize: 18, fontWeight: 800 }}>AI Recommendations</Typography>
+            <Typography component="h2" sx={{ fontSize: 18, fontWeight: 800 }}>AI Recommendations</Typography>
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {aiRecs.map((a, i) => (

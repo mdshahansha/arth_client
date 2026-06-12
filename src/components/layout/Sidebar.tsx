@@ -105,42 +105,61 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeNav, onNavChange }) => {
       </Box>
 
       {/* Navigation */}
-      <Box component="nav" sx={{ flex: 1 }}>
-        {navItems.map((item) => {
-          const isActive = activeNav === item;
-          return (
-            <Box
-              key={item}
-              onClick={() => onNavChange(item)}
-              sx={{
-                py: '12px',
-                cursor: 'pointer',
-                fontSize: isActive ? typo.sidebarNavActive.fontSize : typo.sidebarNav.fontSize,
-                fontWeight: isActive ? typo.sidebarNavActive.fontWeight : typo.sidebarNav.fontWeight,
-                color: isActive ? colors.sidebarActive : colors.sidebarInactive,
-                transition: 'color 200ms, font-weight 200ms',
-                '&:hover': { color: colors.sidebarActive },
-              }}
-            >
-              {item}
-            </Box>
-          );
-        })}
+      <Box component="nav" aria-label="Main navigation" sx={{ flex: 1 }}>
+        <Box component="ul" role="list" sx={{ listStyle: 'none', p: 0, m: 0 }}>
+          {navItems.map((item) => {
+            const isActive = activeNav === item;
+            return (
+              <Box
+                component="li"
+                key={item}
+                role="listitem"
+              >
+                <Box
+                  role="button"
+                  tabIndex={0}
+                  aria-current={isActive ? 'page' : undefined}
+                  onClick={() => onNavChange(item)}
+                  onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavChange(item); } }}
+                  sx={{
+                    py: '12px',
+                    cursor: 'pointer',
+                    fontSize: isActive ? typo.sidebarNavActive.fontSize : typo.sidebarNav.fontSize,
+                    fontWeight: isActive ? typo.sidebarNavActive.fontWeight : typo.sidebarNav.fontWeight,
+                    color: isActive ? colors.sidebarActive : colors.sidebarInactive,
+                    transition: 'color 200ms, font-weight 200ms',
+                    '&:hover': { color: colors.sidebarActive },
+                    borderRadius: '8px',
+                    px: '4px',
+                  }}
+                >
+                  {item}
+                </Box>
+              </Box>
+            );
+          })}
+        </Box>
       </Box>
 
       {/* Bottom actions */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <IconButton onClick={toggleTheme} sx={{ color: colors.sidebarInactive }}>
+        <IconButton onClick={toggleTheme} aria-label={`Switch to ${mode === 'light' ? 'dark' : 'light'} mode`} sx={{ color: colors.sidebarInactive }}>
           {mode === 'light' ? <Brightness4Icon /> : <Brightness7Icon />}
         </IconButton>
         <Box
+          role="button"
+          tabIndex={0}
+          aria-label={isAuthenticated ? 'Logout from your account' : 'Login to your account'}
           onClick={isAuthenticated ? handleLogout : handleLoginClick}
+          onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); (isAuthenticated ? handleLogout : handleLoginClick)(); } }}
           sx={{
             cursor: 'pointer',
             fontSize: typo.sidebarNav.fontSize,
             fontWeight: typo.sidebarNav.fontWeight,
             color: colors.sidebarInactive,
             '&:hover': { color: colors.sidebarActive },
+            borderRadius: '8px',
+            px: '4px',
           }}
         >
           {isAuthenticated ? 'Logout' : 'Login'}

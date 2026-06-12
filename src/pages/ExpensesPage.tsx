@@ -6,6 +6,7 @@ import Skeleton from '@mui/material/Skeleton';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import MenuItem from '@mui/material/MenuItem';
+import Menu from '@mui/material/Menu';
 import Select from '@mui/material/Select';
 import Chip from '@mui/material/Chip';
 import SearchIcon from '@mui/icons-material/Search';
@@ -24,7 +25,7 @@ import { selectIsAuthenticated } from '../features/auth/authSlice';
 import { formatAmount, formatTransactionAmount, formatTime } from '../utils/formatters';
 import { spacing } from '../theme/tokens';
 import { useThemeColors } from '../hooks/useThemeColors';
-import type { TransactionCategory } from '../types';
+import type { Transaction, TransactionCategory } from '../types';
 
 const categoryLabels: Record<string, string> = {
   food: 'Food and Drinks',
@@ -47,6 +48,7 @@ export const ExpensesPage: React.FC = () => {
   const { items: transactions, loading: txnLoading, hasNextPage, loadingMore, fetchNextPage } = useTransactions();
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState('all');
+  const [exportAnchor, setExportAnchor] = useState<null | HTMLElement>(null);
 
   const chartData = useMemo(() => {
     if (!dashboard?.monthlyBreakdown) return undefined;
@@ -80,6 +82,12 @@ export const ExpensesPage: React.FC = () => {
   }, [transactions]);
 
   const maxCatAmount = Math.max(...(categories || []).map((c) => c.amount), 1);
+  const closeExportMenu = () => setExportAnchor(null);
+
+  const handleExport = (format: ExportFormat) => {
+    closeExportMenu();
+    exportTransactions(filteredTxns, format);
+  };
 
   if (!isAuthenticated) {
     return (
@@ -90,21 +98,40 @@ export const ExpensesPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ flex: 1, backgroundColor: colors.cardBg, borderRadius: `${spacing.cardBorderRadius}px`, p: '40px 44px', minHeight: '100vh', overflowY: 'auto', transition: 'background-color 0.3s ease' }}>
+    <Box sx={{ flex: 1, backgroundColor: colors.cardBg, borderRadius: { xs: 0, md: `${spacing.cardBorderRadius}px` }, p: { xs: '20px 16px', sm: '30px 24px', md: '40px 44px' }, minHeight: '100vh', overflowY: 'auto', transition: 'background-color 0.3s ease' }}>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '28px' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '28px', flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography sx={{ fontSize: 34, fontWeight: 600, color: colors.textPrimary }}>Expenses</Typography>
+          <Typography component="h1" sx={{ fontSize: 34, fontWeight: 600, color: colors.textPrimary }}>Expenses</Typography>
           <Typography sx={{ fontSize: 14, color: colors.textSecondary, mt: '4px' }}>Track and manage your spending</Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1.5 }}>
-          <Button variant="outlined" startIcon={<DownloadIcon />} sx={{ color: colors.textPrimary, borderColor: colors.divider, textTransform: 'none', fontWeight: 600 }}>Export</Button>
+          <Button
+            variant="outlined"
+            startIcon={<DownloadIcon />}
+            disabled={filteredTxns.length === 0}
+            onClick={(event) => setExportAnchor(event.currentTarget)}
+            sx={{ color: colors.textPrimary, borderColor: colors.divider, textTransform: 'none', fontWeight: 600 }}
+          >
+            Export
+          </Button>
+          <Menu
+            anchorEl={exportAnchor}
+            open={Boolean(exportAnchor)}
+            onClose={closeExportMenu}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+          >
+            <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
+            <MenuItem onClick={() => handleExport('excel')}>Excel sheet</MenuItem>
+            <MenuItem onClick={() => handleExport('pdf')}>PDF</MenuItem>
+          </Menu>
           <Button variant="contained" startIcon={<AddIcon />} sx={{ backgroundColor: colors.loginButton, textTransform: 'none', fontWeight: 600, '&:hover': { backgroundColor: colors.chartBarActive } }}>Add Expense</Button>
         </Box>
       </Box>
 
       {/* Stat Cards */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', mb: '28px' }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: '20px', mb: '28px' }}>
         {dashLoading ? (
           Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} variant="rounded" height={100} sx={{ borderRadius: '16px' }} />)
         ) : (
@@ -117,7 +144,7 @@ export const ExpensesPage: React.FC = () => {
       </Box>
 
       {/* Chart + Category Breakdown */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '28px', mb: '28px', alignItems: 'start' }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1.5fr 1fr' }, gap: '28px', mb: '28px', alignItems: 'start' }}>
         <Box sx={{ backgroundColor: colors.rightPanelBg, borderRadius: '20px', p: '24px', transition: 'background-color 0.3s ease' }}>
           <Typography sx={{ fontSize: 18, fontWeight: 800, color: colors.textPrimary, mb: '22px' }}>Monthly Expense Trend</Typography>
           {dashLoading ? <Skeleton variant="rounded" height={150} /> : <SpendChart data={chartData} />}
@@ -158,9 +185,9 @@ export const ExpensesPage: React.FC = () => {
         </Box>
 
         {/* Table */}
-        <Box sx={{ px: '24px' }}>
+        <Box sx={{ px: '24px', overflowX: 'auto' }}>
           {/* Header */}
-          <Box sx={{ display: 'grid', gridTemplateColumns: '2fr 1.2fr 1fr 1fr 1fr', gap: 2, py: '12px', borderBottom: `1px solid ${colors.divider}` }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: '2fr 1.2fr 1fr 1fr 1fr', gap: 2, py: '12px', borderBottom: `1px solid ${colors.divider}`, minWidth: 700 }}>
             {['Transaction', 'Date', 'Category', 'Status', 'Amount'].map((h) => (
               <Typography key={h} sx={{ fontSize: 12, fontWeight: 700, color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: h === 'Amount' ? 'right' : 'left' }}>{h}</Typography>
             ))}
@@ -178,7 +205,7 @@ export const ExpensesPage: React.FC = () => {
             </Box>
           ) : (
             filteredTxns.map((txn) => (
-              <Box key={txn.id} sx={{ display: 'grid', gridTemplateColumns: '2fr 1.2fr 1fr 1fr 1fr', gap: 2, py: '14px', borderBottom: `1px solid ${colors.divider}`, alignItems: 'center', '&:hover': { backgroundColor: `${colors.divider}40` }, cursor: 'pointer', transition: 'background-color 150ms' }}>
+              <Box key={txn.id} sx={{ display: 'grid', gridTemplateColumns: '2fr 1.2fr 1fr 1fr 1fr', gap: 2, py: '14px', borderBottom: `1px solid ${colors.divider}`, alignItems: 'center', '&:hover': { backgroundColor: `${colors.divider}40` }, cursor: 'pointer', transition: 'background-color 150ms', minWidth: 700 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                   <CategoryIcon category={txn.category as TransactionCategory} size={42} />
                   <Box>
@@ -212,6 +239,154 @@ export const ExpensesPage: React.FC = () => {
     </Box>
   );
 };
+
+type ExportFormat = 'csv' | 'excel' | 'pdf';
+
+const exportHeaders = ['Transaction', 'Date', 'Category', 'Type', 'Status', 'Amount'];
+
+function exportTransactions(transactions: Transaction[], format: ExportFormat): void {
+  const rows = transactions.map((txn) => [
+    txn.title,
+    formatTime(txn.transaction_date),
+    categoryLabels[txn.category] || txn.category,
+    txn.type,
+    'Completed',
+    formatTransactionAmount(txn.amount, txn.type),
+  ]);
+
+  if (rows.length === 0) return;
+
+  if (format === 'pdf') {
+    exportPdf(rows);
+    return;
+  }
+
+  if (format === 'excel') {
+    downloadFile(
+      `${getExportName()}.xls`,
+      buildExcelDocument(rows),
+      'application/vnd.ms-excel;charset=utf-8;',
+    );
+    return;
+  }
+
+  const csv = [exportHeaders, ...rows].map((row) => row.map(escapeCsvCell).join(',')).join('\n');
+  downloadFile(`${getExportName()}.csv`, `\uFEFF${csv}`, 'text/csv;charset=utf-8;');
+}
+
+function exportPdf(rows: string[][]): void {
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) return;
+
+  printWindow.document.open();
+  printWindow.document.write(buildPrintableDocument(rows));
+  printWindow.document.close();
+  printWindow.focus();
+}
+
+function buildExcelDocument(rows: string[][]): string {
+  return `\uFEFF
+    <html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:x="urn:schemas-microsoft-com:office:excel"
+      xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <meta charset="UTF-8" />
+        <!--[if gte mso 9]>
+        <xml>
+          <x:ExcelWorkbook>
+            <x:ExcelWorksheets>
+              <x:ExcelWorksheet>
+                <x:Name>Expenses</x:Name>
+                <x:WorksheetOptions><x:DisplayGridlines /></x:WorksheetOptions>
+              </x:ExcelWorksheet>
+            </x:ExcelWorksheets>
+          </x:ExcelWorkbook>
+        </xml>
+        <![endif]-->
+      </head>
+      <body>
+        ${buildHtmlTable([exportHeaders, ...rows])}
+      </body>
+    </html>
+  `;
+}
+
+function buildPrintableDocument(rows: string[][]): string {
+  return `
+    <!doctype html>
+    <html>
+      <head>
+        <meta charset="UTF-8" />
+        <title>Expenses Export</title>
+        <style>
+          body { font-family: Arial, sans-serif; color: #111827; padding: 24px; }
+          h1 { font-size: 22px; margin: 0 0 6px; }
+          p { color: #6b7280; margin: 0 0 20px; }
+          table { width: 100%; border-collapse: collapse; font-size: 12px; }
+          th, td { border: 1px solid #d1d5db; padding: 8px; text-align: left; }
+          th { background: #f3f4f6; }
+          td:last-child, th:last-child { text-align: right; }
+        </style>
+      </head>
+      <body>
+        <h1>Expenses</h1>
+        <p>Exported on ${escapeHtml(new Date().toLocaleString())}</p>
+        ${buildHtmlTable([exportHeaders, ...rows])}
+        <script>
+          window.addEventListener('load', function () {
+            window.print();
+          });
+        </script>
+      </body>
+    </html>
+  `;
+}
+
+function buildHtmlTable(rows: string[][]): string {
+  const [headers, ...bodyRows] = rows;
+
+  return `
+    <table>
+      <thead>
+        <tr>${headers.map((header) => `<th>${escapeHtml(header)}</th>`).join('')}</tr>
+      </thead>
+      <tbody>
+        ${bodyRows
+          .map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join('')}</tr>`)
+          .join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function downloadFile(filename: string, content: string, type: string): void {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function getExportName(): string {
+  return `arth-expenses-${new Date().toISOString().slice(0, 10)}`;
+}
+
+function escapeCsvCell(value: string): string {
+  return `"${value.replace(/"/g, '""')}"`;
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 function StatCard({ colors, icon, iconBg, label, value, delta, deltaUp, caption }: {
   colors: any; icon: React.ReactNode; iconBg: string; label: string; value: string; delta?: string; deltaUp?: boolean; caption?: string;

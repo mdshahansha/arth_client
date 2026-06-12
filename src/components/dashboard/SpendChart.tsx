@@ -29,6 +29,8 @@ export const SpendChart: React.FC<SpendChartProps> = ({ data }) => {
 
   return (
     <Box
+      role="img"
+      aria-label={`Bar chart with ${bars.length} data points`}
       sx={{
         display: 'flex',
         alignItems: 'flex-end',
@@ -46,8 +48,12 @@ export const SpendChart: React.FC<SpendChartProps> = ({ data }) => {
         return (
           <Tooltip key={bar.day} title={bar.label} arrow placement="top">
             <Box
+              aria-label={`${bar.label}: ${Math.round(bar.value)}`}
               onMouseEnter={() => setHoveredBar(i)}
               onMouseLeave={() => setHoveredBar(null)}
+              onFocus={() => setHoveredBar(i)}
+              onBlur={() => setHoveredBar(null)}
+              tabIndex={0}
               sx={{
                 width: 10,
                 minWidth: 10,

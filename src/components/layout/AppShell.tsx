@@ -1,9 +1,14 @@
-import React, { lazy, Suspense, useCallback } from 'react';
+import React, { lazy, Suspense, useCallback, useState } from 'react';
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
+import IconButton from '@mui/material/IconButton';
+import Drawer from '@mui/material/Drawer';
+import MenuIcon from '@mui/icons-material/Menu';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { Sidebar } from './Sidebar';
 import { RightPanel } from './RightPanel';
 import { DashboardPage } from '../../pages/DashboardPage';
+import { ErrorBoundary } from '../common/ErrorBoundary';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { selectActiveNav, setActiveNav } from '../../features/ui/uiSlice';
 import { selectCategoryBreakdown, selectDashboardLoading } from '../../features/dashboard/dashboardSlice';
@@ -36,30 +41,37 @@ export const AppShell: React.FC = () => {
   const activeNav = useAppSelector(selectActiveNav);
   const categories = useAppSelector(selectCategoryBreakdown);
   const isLoading = useAppSelector(selectDashboardLoading);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const isMobile = useMediaQuery('(max-width:768px)');
+  const isTablet = useMediaQuery('(max-width:1024px)');
 
   const handleNavChange = useCallback(
-    (item: string) => dispatch(setActiveNav(item)),
+    (item: string) => {
+      dispatch(setActiveNav(item));
+      setMobileOpen(false);
+    },
     [dispatch],
   );
 
-  const showRightPanel = activeNav === 'Dashboard';
+  const showRightPanel = activeNav === 'Dashboard' && !isTablet;
 
   const renderMainContent = () => {
     switch (activeNav) {
       case 'Dashboard':
         return <DashboardPage />;
       case 'Expenses':
-        return <Suspense fallback={<PageFallback />}><ExpensesPage /></Suspense>;
+        return <ErrorBoundary><Suspense fallback={<PageFallback />}><ExpensesPage /></Suspense></ErrorBoundary>;
       case 'Wallets':
-        return <Suspense fallback={<PageFallback />}><WalletsPage /></Suspense>;
+        return <ErrorBoundary><Suspense fallback={<PageFallback />}><WalletsPage /></Suspense></ErrorBoundary>;
       case 'Summary':
-        return <Suspense fallback={<PageFallback />}><SummaryPage /></Suspense>;
+        return <ErrorBoundary><Suspense fallback={<PageFallback />}><SummaryPage /></Suspense></ErrorBoundary>;
       case 'Accounts':
-        return <Suspense fallback={<PageFallback />}><AccountsPage /></Suspense>;
+        return <ErrorBoundary><Suspense fallback={<PageFallback />}><AccountsPage /></Suspense></ErrorBoundary>;
       case 'Settings':
-        return <Suspense fallback={<PageFallback />}><SettingsPage /></Suspense>;
+        return <ErrorBoundary><Suspense fallback={<PageFallback />}><SettingsPage /></Suspense></ErrorBoundary>;
       case 'View Tips':
-        return <Suspense fallback={<PageFallback />}><ViewTipsPage /></Suspense>;
+        return <ErrorBoundary><Suspense fallback={<PageFallback />}><ViewTipsPage /></Suspense></ErrorBoundary>;
       default:
         return <DashboardPage />;
     }
@@ -76,9 +88,42 @@ export const AppShell: React.FC = () => {
         transition: 'background-color 0.3s ease',
       }}
     >
-      <Sidebar activeNav={activeNav} onNavChange={handleNavChange} />
+      {isMobile && (
+        <IconButton
+          onClick={() => setMobileOpen(true)}
+          sx={{
+            position: 'fixed',
+            top: 16,
+            left: 16,
+            zIndex: 1300,
+            backgroundColor: colors.cardBg,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            '&:hover': { backgroundColor: colors.cardBg },
+          }}
+        >
+          <MenuIcon sx={{ color: colors.textPrimary }} />
+        </IconButton>
+      )}
 
-      <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      {isMobile ? (
+        <Drawer
+          open={mobileOpen}
+          onClose={() => setMobileOpen(false)}
+          sx={{
+            '& .MuiDrawer-paper': {
+              width: 280,
+              backgroundColor: colors.appBg,
+              borderRight: 'none',
+            },
+          }}
+        >
+          <Sidebar activeNav={activeNav} onNavChange={handleNavChange} />
+        </Drawer>
+      ) : (
+        <Sidebar activeNav={activeNav} onNavChange={handleNavChange} />
+      )}
+
+      <Box component="main" id="main-content" role="main" aria-label="Main content" tabIndex={-1} sx={{ display: 'flex', flex: 1, overflow: 'hidden', outline: 'none' }}>
         {renderMainContent()}
         {showRightPanel && (
           <RightPanel

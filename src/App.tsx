@@ -13,6 +13,7 @@ import './theme/global.css';
 const App: React.FC = () => (
   <Provider store={store}>
     <AppThemeProvider>
+      <a href="#main-content" className="skip-to-main">Skip to main content</a>
       <AuthListener />
       <WelcomeSplash />
       <AppShell />

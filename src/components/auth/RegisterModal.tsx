@@ -83,6 +83,7 @@ export const RegisterModal: React.FC = () => {
     <Modal
       open={isOpen}
       onClose={handleClose}
+      aria-labelledby="register-modal-title"
       sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       slotProps={{ backdrop: { sx: { backgroundColor: 'rgba(0,0,0,0.5)' } } }}
     >
@@ -107,18 +108,18 @@ export const RegisterModal: React.FC = () => {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
           >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
               <path d="M10 2C10 2 6 6 6 10C6 14 10 18 10 18C10 18 14 14 14 10C14 6 10 2 10 2Z" fill="white" />
               <path d="M10 5C10 5 8 7 8 10C8 13 10 15 10 15C10 15 12 13 12 10C12 7 10 5 10 5Z" fill="#3F4254" />
             </svg>
           </Box>
-          <Typography sx={{ fontSize: '28px', fontWeight: 700, letterSpacing: '4px', color: colors.textPrimary }}>
+          <Typography id="register-modal-title" sx={{ fontSize: '28px', fontWeight: 700, letterSpacing: '4px', color: colors.textPrimary }}>
             SMOKE
           </Typography>
         </Box>
 
         {registerSuccess && (
-          <Box sx={{ mb: 3, p: 2, borderRadius: '8px', backgroundColor: colors.successBg, textAlign: 'center' }}>
+          <Box role="status" aria-live="polite" sx={{ mb: 3, p: 2, borderRadius: '8px', backgroundColor: colors.successBg, textAlign: 'center' }}>
             <Typography sx={{ fontSize: '13px', color: colors.tealGreen, fontWeight: 500 }}>
               Registration successful! Redirecting to login...
             </Typography>
@@ -126,7 +127,7 @@ export const RegisterModal: React.FC = () => {
         )}
 
         {registerError && (
-          <Box sx={{ mb: 3, p: 2, borderRadius: '8px', backgroundColor: colors.errorBg, textAlign: 'center' }}>
+          <Box role="alert" sx={{ mb: 3, p: 2, borderRadius: '8px', backgroundColor: colors.errorBg, textAlign: 'center' }}>
             <Typography sx={{ fontSize: '13px', color: colors.errorRed, fontWeight: 500 }}>
               {registerError.message}
             </Typography>
@@ -176,7 +177,7 @@ export const RegisterModal: React.FC = () => {
 
         <Typography sx={{ fontSize: '13px', color: colors.textSecondary, mt: '20px', textAlign: 'center' }}>
           Already have an account?{' '}
-          <Box component="span" onClick={handleSwitchToLogin} sx={{ color: colors.chartBarActive, cursor: 'pointer', fontWeight: 500 }}>
+          <Box component="span" role="button" tabIndex={0} onClick={handleSwitchToLogin} onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSwitchToLogin(); } }} sx={{ color: colors.chartBarActive, cursor: 'pointer', fontWeight: 500 }}>
             Login
           </Box>
         </Typography>

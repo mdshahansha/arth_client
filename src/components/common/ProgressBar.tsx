@@ -18,8 +18,14 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   const barColor = color ?? themeColors.tealGreen;
   const barTrack = trackColor ?? themeColors.progressTrack;
 
+  const clampedValue = Math.min(Math.max(value, 0), 100);
+
   return (
     <Box
+      role="progressbar"
+      aria-valuenow={Math.round(clampedValue)}
+      aria-valuemin={0}
+      aria-valuemax={100}
       sx={{
         width: '100%',
         height: spacing.progressBarHeight,
@@ -32,7 +38,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     >
       <Box
         sx={{
-          width: `${Math.min(Math.max(value, 0), 100)}%`,
+          width: `${clampedValue}%`,
           height: '100%',
           backgroundColor: barColor,
           borderRadius: spacing.progressBarHeight / 2,

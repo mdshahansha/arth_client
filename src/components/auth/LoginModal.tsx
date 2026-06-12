@@ -53,6 +53,7 @@ export const LoginModal: React.FC = () => {
     <Modal
       open={isOpen}
       onClose={handleClose}
+      aria-labelledby="login-modal-title"
       sx={{
         display: 'flex',
         alignItems: 'center',
@@ -87,19 +88,19 @@ export const LoginModal: React.FC = () => {
               justifyContent: 'center',
             }}
           >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
               <path d="M10 2C10 2 6 6 6 10C6 14 10 18 10 18C10 18 14 14 14 10C14 6 10 2 10 2Z" fill="white" />
               <path d="M10 5C10 5 8 7 8 10C8 13 10 15 10 15C10 15 12 13 12 10C12 7 10 5 10 5Z" fill="#3F4254" />
             </svg>
           </Box>
-          <Typography sx={{ fontSize: '28px', fontWeight: 700, letterSpacing: '4px', color: colors.textPrimary }}>
+          <Typography id="login-modal-title" sx={{ fontSize: '28px', fontWeight: 700, letterSpacing: '4px', color: colors.textPrimary }}>
             SMOKE
           </Typography>
         </Box>
 
         {/* Session expired warning */}
         {sessionExpired && (
-          <Box sx={{ mb: 3, p: 2, borderRadius: '8px', backgroundColor: colors.errorBg, textAlign: 'center' }}>
+          <Box role="alert" sx={{ mb: 3, p: 2, borderRadius: '8px', backgroundColor: colors.errorBg, textAlign: 'center' }}>
             <Typography sx={{ fontSize: '13px', color: colors.errorRed, fontWeight: 500 }}>
               Session expired. Please login again.
             </Typography>
@@ -108,7 +109,7 @@ export const LoginModal: React.FC = () => {
 
         {/* API error */}
         {loginError && (
-          <Box sx={{ mb: 3, p: 2, borderRadius: '8px', backgroundColor: colors.errorBg, textAlign: 'center' }}>
+          <Box role="alert" sx={{ mb: 3, p: 2, borderRadius: '8px', backgroundColor: colors.errorBg, textAlign: 'center' }}>
             <Typography sx={{ fontSize: '13px', color: colors.errorRed, fontWeight: 500 }}>
               {loginError.message}
             </Typography>
@@ -146,6 +147,8 @@ export const LoginModal: React.FC = () => {
           </Box>
 
           <Typography
+            role="button"
+            tabIndex={0}
             sx={{ fontSize: '12px', color: colors.textSecondary, mb: '32px', cursor: 'pointer', '&:hover': { color: colors.textPrimary } }}
           >
             Forgot Your Password?
@@ -177,7 +180,10 @@ export const LoginModal: React.FC = () => {
           Don&apos;t have an account?{' '}
           <Box
             component="span"
+            role="button"
+            tabIndex={0}
             onClick={handleSwitchToRegister}
+            onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSwitchToRegister(); } }}
             sx={{ color: colors.chartBarActive, cursor: 'pointer', fontWeight: 500 }}
           >
             Register
