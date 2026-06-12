@@ -14,7 +14,7 @@ import { clearDashboard } from '../../features/dashboard/dashboardSlice';
 import { clearTransactions } from '../../features/transactions/transactionsSlice';
 import { useThemeMode } from '../../context/ThemeContext';
 
-const navItems = ['Dashboard', 'Expenses', 'Wallets', 'Summary', 'Accounts', 'Settings'];
+const navItems = ['Dashboard', 'Expenses', 'Wallets', 'Summary', 'Accounts', 'Settings', 'View Tips'];
 
 interface SidebarProps {
   activeNav: string;

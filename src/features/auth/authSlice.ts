@@ -84,7 +84,7 @@ export const registerThunk = createAsyncThunk<
 
 export const logoutThunk = createAsyncThunk<void, void, { rejectValue: SerializedError }>(
   'auth/logout',
-  async (_, { rejectWithValue }) => {
+  async () => {
     try {
       await logoutApi();
     } catch {

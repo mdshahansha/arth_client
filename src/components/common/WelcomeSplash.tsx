@@ -80,11 +80,8 @@ export const WelcomeSplash: React.FC = () => {
       <Typography
         sx={{
           fontSize: { xs: '48px', sm: '64px' },
-          animation: 'splashWave 1.8s ease-in-out 0.3s',
           mb: '8px',
           opacity: 0,
-          animationFillMode: 'forwards',
-          animationDelay: '0.2s',
           '@keyframes waveReveal': {
             '0%': { opacity: 0, transform: 'scale(0)' },
             '30%': { opacity: 1, transform: 'scale(1.2)' },

@@ -12,7 +12,7 @@ export const errorMiddleware: Middleware = () => (next) => (action) => {
     const error = action.payload as SerializedError;
 
     // Auth errors are handled by authSlice + 401 interceptor — skip toast
-    const silentCodes = new Set([
+    const silentCodes = new Set<string>([
       ErrorCodes.NO_TOKEN,
       ErrorCodes.INVALID_TOKEN,
       ErrorCodes.SESSION_REVOKED,

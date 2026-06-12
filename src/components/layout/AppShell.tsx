@@ -9,9 +9,26 @@ import { selectActiveNav, setActiveNav } from '../../features/ui/uiSlice';
 import { selectCategoryBreakdown, selectDashboardLoading } from '../../features/dashboard/dashboardSlice';
 import { useThemeColors } from '../../hooks/useThemeColors';
 
-const PlaceholderPage = lazy(() =>
-  import('../../pages/PlaceholderPage').then((m) => ({ default: m.PlaceholderPage }))
+const ExpensesPage = lazy(() =>
+  import('../../pages/ExpensesPage').then((m) => ({ default: m.ExpensesPage }))
 );
+const WalletsPage = lazy(() =>
+  import('../../pages/WalletsPage').then((m) => ({ default: m.WalletsPage }))
+);
+const SummaryPage = lazy(() =>
+  import('../../pages/SummaryPage').then((m) => ({ default: m.SummaryPage }))
+);
+const AccountsPage = lazy(() =>
+  import('../../pages/AccountsPage').then((m) => ({ default: m.AccountsPage }))
+);
+const SettingsPage = lazy(() =>
+  import('../../pages/SettingsPage').then((m) => ({ default: m.SettingsPage }))
+);
+const ViewTipsPage = lazy(() =>
+  import('../../pages/ViewTipsPage').then((m) => ({ default: m.ViewTipsPage }))
+);
+
+const PageFallback = () => <Skeleton variant="rounded" width="100%" height="100vh" />;
 
 export const AppShell: React.FC = () => {
   const colors = useThemeColors();
@@ -25,17 +42,26 @@ export const AppShell: React.FC = () => {
     [dispatch],
   );
 
+  const showRightPanel = activeNav === 'Dashboard';
+
   const renderMainContent = () => {
     switch (activeNav) {
       case 'Dashboard':
-      case 'Expenses':
         return <DashboardPage />;
+      case 'Expenses':
+        return <Suspense fallback={<PageFallback />}><ExpensesPage /></Suspense>;
+      case 'Wallets':
+        return <Suspense fallback={<PageFallback />}><WalletsPage /></Suspense>;
+      case 'Summary':
+        return <Suspense fallback={<PageFallback />}><SummaryPage /></Suspense>;
+      case 'Accounts':
+        return <Suspense fallback={<PageFallback />}><AccountsPage /></Suspense>;
+      case 'Settings':
+        return <Suspense fallback={<PageFallback />}><SettingsPage /></Suspense>;
+      case 'View Tips':
+        return <Suspense fallback={<PageFallback />}><ViewTipsPage /></Suspense>;
       default:
-        return (
-          <Suspense fallback={<Skeleton variant="rounded" width="100%" height="100vh" />}>
-            <PlaceholderPage title={activeNav} />
-          </Suspense>
-        );
+        return <DashboardPage />;
     }
   };
 
@@ -54,10 +80,12 @@ export const AppShell: React.FC = () => {
 
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {renderMainContent()}
-        <RightPanel
-          categories={categories}
-          isLoading={isLoading}
-        />
+        {showRightPanel && (
+          <RightPanel
+            categories={categories}
+            isLoading={isLoading}
+          />
+        )}
       </Box>
     </Box>
   );
